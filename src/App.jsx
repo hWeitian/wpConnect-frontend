@@ -65,13 +65,31 @@ const theme = createTheme({
         },
       },
     },
+    MuiDataGrid: {
+      styleOverrides: {
+        root: {
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: "#FBF8FF",
+            color: "#000000",
+            cursor: "auto",
+          },
+          "&.MuiDataGrid-root .MuiDataGrid-cell:focus-within": {
+            outline: "none !important",
+          },
+          "& .MuiDataGrid-cell:hover": {
+            cursor: "pointer",
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: 400,
+          },
+        },
+      },
+    },
   },
 });
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
-
-  console.log(isAuthenticated);
 
   if (isLoading) {
     return <Loading />;

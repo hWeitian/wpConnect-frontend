@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 
-const DataTable = ({ checkboxSelection, columns, rows }) => {
+const DataTable = ({ checkboxSelection, columns, rows, isDataLoading }) => {
   const defaultPage = 0;
   const defaultPageSize = 10;
 
@@ -20,6 +20,7 @@ const DataTable = ({ checkboxSelection, columns, rows }) => {
       disableRowSelectionOnClick
       paginationModel={paginationModel}
       onPaginationModelChange={setPaginationModel}
+      loading={isDataLoading}
     />
   );
 };
