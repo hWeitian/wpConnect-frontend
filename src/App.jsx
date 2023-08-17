@@ -1,35 +1,83 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
+import { createTheme, ThemeProvider } from "@mui/material";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./pages/Layout";
+import NotFound from "./pages/404";
+import Conferences from "./pages/Conferences";
+import Contacts from "./pages/Contacts";
+
+const theme = createTheme({
+  palette: {
+    white: {
+      main: "#FFFFFF",
+      contrastText: "#000000",
+    },
+    primary: {
+      main: "#2B45D9",
+      contrastText: "#FFFFFF",
+    },
+    secondary: {
+      main: "#6669FF",
+      contrastText: "#FFFFFF",
+    },
+  },
+  typography: {
+    fontFamily: ["Inter", "sans-serif"].join(","),
+    button: {
+      fontWeight: 700,
+      textTransform: "none",
+    },
+  },
+  components: {
+    MuiAppBar: {
+      styleOverrides: {
+        root: { boxShadow: "none" },
+      },
+    },
+    MuiList: {
+      styleOverrides: {
+        root: { padding: "0px" },
+      },
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          paddingRight: "0",
+          borderRadius: "8px",
+          width: "100%",
+          "&.Mui-selected": {
+            backgroundColor: "#2B45D9",
+            color: "#FFFFFF",
+          },
+          "&.Mui-selected:hover": {
+            backgroundColor: "#2B45D9",
+            color: "#FFFFFF",
+          },
+          "&:hover": {
+            backgroundColor: "#D5C5FF",
+            color: "#000000",
+          },
+        },
+      },
+    },
+  },
+});
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <ThemeProvider theme={theme}>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          {/* <Route path="/" element={isAuthenticated ? <Main /> : <Login />}> */}
+          <Route path="contacts" element={<Contacts />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;
