@@ -1,8 +1,11 @@
 import { Button, Grid, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import LogoSquare from "../assets/logo-square.png";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Login = () => {
+  const { loginWithRedirect } = useAuth0();
+
   return (
     <Grid
       container
@@ -24,6 +27,7 @@ const Login = () => {
           Please log in to access this page
         </Typography>
         <Button
+          onClick={() => loginWithRedirect()}
           variant="contained"
           color="primary"
           sx={{ width: "200px", mt: 3, fontWeight: 700 }}

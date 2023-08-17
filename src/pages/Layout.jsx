@@ -22,12 +22,13 @@ import PermContactCalendarIcon from "@mui/icons-material/PermContactCalendar";
 import Logo from "../assets/logo.png";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import Conferences from "./Conferences";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const drawerWidth = 240;
 
 const Layout = () => {
-  const currentPath = useLocation().pathname;
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const { logout } = useAuth0();
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -36,6 +37,8 @@ const Layout = () => {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  const currentPath = useLocation().pathname;
 
   const mainNav = [
     [
@@ -101,7 +104,13 @@ const Layout = () => {
             open={Boolean(anchorElUser)}
             onClose={handleCloseUserMenu}
           >
-            <MenuItem onClick={handleCloseUserMenu}>Logout</MenuItem>
+            <MenuItem
+              onClick={() =>
+                logout({ logoutParams: { returnTo: window.location.origin } })
+              }
+            >
+              Logout
+            </MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>

@@ -3,11 +3,13 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import { createTheme, ThemeProvider } from "@mui/material";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import Layout from "./pages/Layout";
 import NotFound from "./pages/404";
-import Conferences from "./pages/Conferences";
+import Login from "./pages/Login";
 import Contacts from "./pages/Contacts";
+import Loading from "./components/Loading";
 
 const theme = createTheme({
   palette: {
@@ -67,11 +69,18 @@ const theme = createTheme({
 });
 
 function App() {
+  const { isAuthenticated, isLoading } = useAuth0();
+
+  console.log(isAuthenticated);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <Routes>
-        <Route path="/" element={<Layout />}>
-          {/* <Route path="/" element={isAuthenticated ? <Main /> : <Login />}> */}
+        <Route path="/" element={isAuthenticated ? <Layout /> : <Login />}>
           <Route path="contacts" element={<Contacts />} />
         </Route>
         <Route path="*" element={<NotFound />} />
