@@ -1,8 +1,9 @@
 import { Typography, Button, Grid } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function PageHeader({ children, hasButton, linkPath, title }) {
+  const navigate = useNavigate();
   return (
     <Grid container justifyContent="space-between">
       <Grid item>
@@ -14,12 +15,14 @@ export default function PageHeader({ children, hasButton, linkPath, title }) {
       </Grid>
       {hasButton && (
         <Grid item>
-          <Link href={linkPath}>
-            <Button variant="outlined" color="secondary">
-              <AddIcon />
-              Add {title}
-            </Button>
-          </Link>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => navigate(linkPath)}
+          >
+            <AddIcon />
+            Add {title}
+          </Button>
         </Grid>
       )}
     </Grid>

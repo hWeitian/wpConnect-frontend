@@ -27,9 +27,7 @@ export const makeRequest = (method, endPoint, accessToken, data) => {
       };
     })
     .catch((error) => {
-      return {
-        status: error.status,
-        data: error.response,
-      };
+      // Return a promise so that it can be read by TanStack Query Mutation to set isError to true
+      return Promise.reject(error?.response?.data ?? "Error");
     });
 };

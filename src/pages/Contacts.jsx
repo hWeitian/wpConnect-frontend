@@ -55,7 +55,7 @@ const Contacts = () => {
     rows = contacts.map((contact) => {
       return {
         id: contact.id,
-        firstName: contact.lastName,
+        firstName: contact.firstName,
         lastName: contact.lastName,
         country: contact.country,
         title: contact.title,
