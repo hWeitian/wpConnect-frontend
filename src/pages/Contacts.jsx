@@ -1,12 +1,16 @@
+import { useState } from "react";
 import PageHeader from "../components/PageHeader";
 import DataTable from "../components/DataTable";
 import useGetAccessToken from "../hooks/useGetAccessToken";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getContacts } from "../services/contacts";
+import { IconButton } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Contacts = () => {
   const getAccessToken = useGetAccessToken();
   let rows = [];
+  const [hoverRowId, setHoverRowId] = useState(null);
 
   const {
     data: contacts,
@@ -48,10 +52,38 @@ const Contacts = () => {
       width: 200,
       editable: false,
     },
+    {
+      field: "delete",
+      headerName: "",
+      width: 20,
+      sortable: false,
+      renderCell: (params) => {
+        const deleteClicked = () => {
+          console.log("delete clicked for", params.row.id);
+          // setOpenConfirmation(true);
+          // setSelectedRow(params.row);
+        };
+        return (
+          +hoverRowId === params.row.id && (
+            <IconButton onClick={deleteClicked}>
+              <DeleteIcon sx={{ fontSize: 21 }} />
+            </IconButton>
+          )
+        );
+      },
+    },
   ];
 
+  const handleHiddenIconOpen = (event) => {
+    setHoverRowId(event.currentTarget.parentElement.dataset.id);
+  };
+
+  const handleHiddenIconClose = () => {
+    setHoverRowId(null);
+  };
+
   if (contacts && contacts.length > 0) {
-    console.log(contacts);
+    // console.log(contacts);
     rows = contacts.map((contact) => {
       return {
         id: contact.id,
@@ -75,6 +107,8 @@ const Contacts = () => {
         columns={columns}
         rows={rows}
         isDataLoading={isContactsLoading}
+        handleHiddenIconOpen={handleHiddenIconOpen}
+        handleHiddenIconClose={handleHiddenIconClose}
       />
     </>
   );
