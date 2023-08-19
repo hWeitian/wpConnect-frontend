@@ -8,6 +8,7 @@ import {
   styled,
   Switch,
   IconButton,
+  Typography,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import AutocompleteInput from "./AutocompleteInput";
@@ -104,6 +105,11 @@ const ContactForm = ({
         </div>
       </button>
       <div style={{ marginTop: "40px" }}>
+        <Typography
+          style={{ fontWeight: 700, fontSize: "1.2rem", marginBottom: "10px" }}
+        >
+          Contact Details
+        </Typography>
         <form onSubmit={handleSubmit(onSubmit)} style={{ width: "70%" }}>
           <Controller
             control={control}

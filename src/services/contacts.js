@@ -7,6 +7,5 @@ export const getContacts = async (accessToken) => {
 
 export const addContact = async (accessToken, data) => {
   const result = await makeRequest("POST", "speakers", accessToken, data);
-  console.log(result);
   return result;
 };

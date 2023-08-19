@@ -4,7 +4,6 @@ import PageHeader from "../components/PageHeader";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Grid, Button } from "@mui/material";
 import ContactForm from "../components/ContactForm";
 import { uploadBytes, getDownloadURL, ref } from "firebase/storage";
 import { storage } from "../firebase";
@@ -14,12 +13,11 @@ const AddContact = () => {
   const [selectedCountries, setSelectedCountries] = useState();
   const [selectedTitle, setSelectedTitle] = useState();
   const [photoPreviewLink, setPhotoPreviewLink] = useState("");
-  const [loading, setLoading] = useState(false);
   const inputRef = useRef(null);
   const getAccessToken = useGetAccessToken();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [setOpenFeedback, setFeedbackMsg, setFeedbackSeverity, updateName] =
+  const [setOpenFeedback, setFeedbackMsg, setFeedbackSeverity] =
     useOutletContext();
 
   const form = useForm({
@@ -135,10 +133,8 @@ const AddContact = () => {
         handleInputClick={handleInputClick}
         inputRef={inputRef}
         handlePhotoInput={handlePhotoInput}
-        loading={loading}
+        loading={isLoading}
       />
-
-      {/* <pre>{JSON.stringify(watch(), null, 2)}</pre> */}
     </>
   );
 };
