@@ -6,11 +6,20 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getContacts } from "../services/contacts";
 import { IconButton } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import ConfirmationModal from "../components/ConfirmationModal";
+import { deleteContact } from "../services/contacts";
 
 const Contacts = () => {
-  const getAccessToken = useGetAccessToken();
-  let rows = [];
+  const [openConfirmation, setOpenConfirmation] = useState(false);
+  const [selectedRowId, setSelectedRowId] = useState();
   const [hoverRowId, setHoverRowId] = useState(null);
+  const [setOpenFeedback, setFeedbackMsg, setFeedbackSeverity] =
+    useOutletContext();
+  const getAccessToken = useGetAccessToken();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  let rows = [];
 
   const {
     data: contacts,
@@ -23,6 +32,20 @@ const Contacts = () => {
       return getContacts(accessToken);
     },
     refetchOnWindowFocus: false, // it is not necessary to keep refetching
+  });
+
+  const { mutate: deleteContactMutation, isLoading: isDeleting } = useMutation({
+    mutationFn: async () => {
+      const accessToken = await getAccessToken();
+      return deleteContact(accessToken, selectedRowId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["contacts"], { exact: true });
+      setOpenFeedback(true);
+      setFeedbackSeverity("success");
+      setFeedbackMsg(`Contact Deleted`);
+      setSelectedRowId(null);
+    },
   });
 
   const columns = [
@@ -58,14 +81,15 @@ const Contacts = () => {
       width: 20,
       sortable: false,
       renderCell: (params) => {
-        const deleteClicked = () => {
+        const deleteClicked = (event) => {
+          event.stopPropagation();
           console.log("delete clicked for", params.row.id);
-          // setOpenConfirmation(true);
-          // setSelectedRow(params.row);
+          setOpenConfirmation(true);
+          setSelectedRowId(params.row.id);
         };
         return (
           +hoverRowId === params.row.id && (
-            <IconButton onClick={deleteClicked}>
+            <IconButton onClick={(event) => deleteClicked(event)}>
               <DeleteIcon sx={{ fontSize: 21 }} />
             </IconButton>
           )
@@ -80,6 +104,15 @@ const Contacts = () => {
 
   const handleHiddenIconClose = () => {
     setHoverRowId(null);
+  };
+
+  const handleRowClick = (params) => {
+    navigate(`/contacts/${params.row.id}`);
+  };
+
+  const handleDelete = () => {
+    deleteContactMutation();
+    setOpenConfirmation(false);
   };
 
   if (contacts && contacts.length > 0) {
@@ -109,7 +142,17 @@ const Contacts = () => {
         isDataLoading={isContactsLoading}
         handleHiddenIconOpen={handleHiddenIconOpen}
         handleHiddenIconClose={handleHiddenIconClose}
+        handleRowClick={handleRowClick}
       />
+      <ConfirmationModal
+        open={openConfirmation}
+        setOpenConfirmation={setOpenConfirmation}
+        handleDelete={handleDelete}
+        title="Delete Contact"
+      >
+        Are you sure you want to delete this contact? This action cannot be
+        undone.
+      </ConfirmationModal>
     </>
   );
 };

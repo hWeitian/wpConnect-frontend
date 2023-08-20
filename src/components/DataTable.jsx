@@ -8,6 +8,7 @@ const DataTable = ({
   isDataLoading,
   handleHiddenIconOpen,
   handleHiddenIconClose,
+  handleRowClick,
 }) => {
   const defaultPage = 0;
   const defaultPageSize = 10;
@@ -34,6 +35,7 @@ const DataTable = ({
           onMouseLeave: handleHiddenIconClose,
         },
       }}
+      onRowClick={handleRowClick}
     />
   );
 };

@@ -10,8 +10,8 @@ import { storage } from "../firebase";
 import { addContact } from "../services/contacts";
 
 const AddContact = () => {
-  const [selectedCountries, setSelectedCountries] = useState();
-  const [selectedTitle, setSelectedTitle] = useState();
+  // const [selectedCountries, setSelectedCountries] = useState();
+  // const [selectedTitle, setSelectedTitle] = useState();
   const [photoPreviewLink, setPhotoPreviewLink] = useState("");
   const inputRef = useRef(null);
   const getAccessToken = useGetAccessToken();
@@ -20,27 +20,27 @@ const AddContact = () => {
   const [setOpenFeedback, setFeedbackMsg, setFeedbackSeverity] =
     useOutletContext();
 
-  const form = useForm({
-    defaultValues: {
-      photo: "",
-      firstName: "",
-      lastName: "",
-      country: { value: "", label: "" },
-      title: { value: "", label: "" },
-      email: "",
-      organisation: "",
-      biography: "",
-      isAdmin: false,
-    },
-  });
+  // const form = useForm({
+  //   defaultValues: {
+  //     photo: "",
+  //     firstName: "",
+  //     lastName: "",
+  //     country: { value: "", label: "" },
+  //     title: { value: "", label: "" },
+  //     email: "",
+  //     organisation: "",
+  //     biography: "",
+  //     isAdmin: false,
+  //   },
+  // });
 
-  const {
-    handleSubmit,
-    formState: { errors },
-    control,
-    reset,
-    setValue,
-  } = useForm();
+  // const {
+  //   handleSubmit,
+  //   formState: { errors },
+  //   control,
+  //   reset,
+  //   setValue,
+  // } = useForm();
 
   const handleInputClick = () => {
     inputRef.current.click();
@@ -85,7 +85,7 @@ const AddContact = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries(["contacts"], { exact: true });
-        form.reset();
+        // form.reset();
         setPhotoPreviewLink("");
         navigate("/contacts");
         setOpenFeedback(true);
@@ -110,30 +110,31 @@ const AddContact = () => {
     }
   }, [addHasError, addError]);
 
-  const onSubmit = (data) => {
-    console.log("submit clicked");
-    data.country = selectedCountries.value;
-    data.title = selectedTitle.value;
-    console.log(data);
-    uploadContact(data);
-  };
+  // const onSubmit = (data) => {
+  //   data.country = selectedCountries.value;
+  //   data.title = selectedTitle.value;
+  //   uploadContact(data);
+  // };
 
   return (
     <>
       <PageHeader hasButton={false}>Add Contact</PageHeader>
       <ContactForm
-        onSubmit={onSubmit}
-        control={control}
-        handleSubmit={handleSubmit}
-        selectedCountries={selectedCountries}
-        setSelectedCountries={setSelectedCountries}
-        selectedTitle={selectedTitle}
-        setSelectedTitle={setSelectedTitle}
+        // onSubmit={onSubmit}
+        // control={control}
+        // handleSubmit={handleSubmit}
+        // selectedCountries={selectedCountries}
+        // setSelectedCountries={setSelectedCountries}
+        // selectedTitle={selectedTitle}
+        // setSelectedTitle={setSelectedTitle}
         photoPreviewLink={photoPreviewLink}
+        setPhotoPreviewLink={setPhotoPreviewLink}
         handleInputClick={handleInputClick}
         inputRef={inputRef}
         handlePhotoInput={handlePhotoInput}
         loading={isLoading}
+        submitData={uploadContact}
+        disableImageInput={false}
       />
     </>
   );

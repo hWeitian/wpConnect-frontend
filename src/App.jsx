@@ -12,6 +12,7 @@ import Contacts from "./pages/Contacts";
 import Loading from "./components/Loading";
 import AddContact from "./pages/AddContact";
 import AddConference from "./pages/AddConference";
+import Contact from "./pages/Contact";
 
 const theme = createTheme({
   palette: {
@@ -102,6 +103,7 @@ function App() {
       <Routes>
         <Route path="/" element={isAuthenticated ? <Layout /> : <Login />}>
           <Route path="contacts" element={<Contacts />} />
+          <Route path="contacts/:contactId" element={<Contact />} />
           <Route path="add-contact" element={<AddContact />} />
           <Route path="add-conference" element={<AddConference />} />
         </Route>

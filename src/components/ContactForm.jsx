@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import {
   Grid,
@@ -15,6 +15,7 @@ import AutocompleteInput from "./AutocompleteInput";
 import { countries, titles } from "../utils/dropdownData";
 import EditIcon from "@mui/icons-material/Edit";
 import Dummy from "../assets/dummy.jpg";
+import ImageInput from "./ImageInput";
 
 const style = {
   position: "relative",
@@ -65,73 +66,128 @@ const TextSwitch = styled(Switch)(({ theme }) => ({
 }));
 
 const ContactForm = ({
-  onSubmit,
-  control,
-  handleSubmit,
-  selectedCountries,
-  setSelectedCountries,
-  selectedTitle,
-  setSelectedTitle,
-  data,
+  // onSubmit,
+  // control,
+  // handleSubmit,
+  // selectedCountries,
+  // setSelectedCountries,
+  // selectedTitle,
+  // setSelectedTitle,
+  // data,
   photoPreviewLink,
+  setPhotoPreviewLink,
   handleInputClick,
   inputRef,
   handlePhotoInput,
   loading,
+  submitData,
+  disableImageInput,
+  dataToPrefill,
 }) => {
+  const [selectedCountries, setSelectedCountries] = useState();
+  const [selectedTitle, setSelectedTitle] = useState();
+
+  useEffect(() => {
+    if (dataToPrefill) {
+      prefillData(dataToPrefill);
+    }
+  }, []);
+
+  const form = useForm({
+    defaultValues: {
+      photo: "",
+      firstName: "",
+      lastName: "",
+      country: { value: "", label: "" },
+      title: { value: "", label: "" },
+      email: "",
+      organisation: "",
+      biography: "",
+      isAdmin: false,
+    },
+  });
+
+  const prefillData = (data) => {
+    console.log("data to prefill", data);
+    setValue("firstName", data.firstName);
+    setValue("lastName", data.lastName);
+    setValue("country", { value: data.country, label: data.country });
+    setValue("title", { value: data.title, label: data.title });
+    setValue("email", data.email);
+    setValue("organisation", data.organisation);
+    setValue("biography", data.biography);
+    setValue("isAdmin", data.isAdmin);
+    if (data?.photoUrl?.length > 0) {
+      setPhotoPreviewLink(data.photoUrl);
+    }
+  };
+
+  const {
+    handleSubmit,
+    formState: { errors },
+    control,
+    reset,
+    setValue,
+  } = useForm();
+
+  const onSubmit = (data) => {
+    data.country = data.country.value;
+    data.title = data.title.value;
+    console.log(data);
+    submitData(data);
+  };
+
   return (
     <>
-      <button
-        type="button"
-        onClick={handleInputClick}
-        style={{ marginTop: "10px", border: "0", backgroundColor: "white" }}
-      >
-        <div style={{ position: "relative" }}>
-          <img
-            src={photoPreviewLink ? photoPreviewLink : Dummy}
-            alt="speaker photo"
-            width="120px"
-            style={{ borderRadius: "10px" }}
-          />
-
-          <EditIcon
-            style={{
-              position: "absolute",
-              bottom: "-5px",
-              right: "-10px",
-              cursor: "pointer",
-            }}
-          />
-        </div>
-      </button>
-      <div style={{ marginTop: "40px" }}>
-        <Typography
-          style={{ fontWeight: 700, fontSize: "1.2rem", marginBottom: "10px" }}
-        >
-          Contact Details
-        </Typography>
+      {!disableImageInput && (
+        <ImageInput
+          handleInputClick={handleInputClick}
+          photoPreviewLink={photoPreviewLink}
+          dummyImage={Dummy}
+        />
+      )}
+      <div>
         <form onSubmit={handleSubmit(onSubmit)} style={{ width: "70%" }}>
           <Controller
             control={control}
             name="photo"
-            rules={{ required: "Please enter first name" }}
+            rules={{ required: "Please upload a photo" }}
             defaultValue=""
             render={({
               field: { ref, onChange, ...field },
               fieldState: { error },
             }) => (
-              <input
-                ref={inputRef}
-                hidden
-                accept="image/*"
-                type="file"
-                onChange={(e) => {
-                  e.target.files[0] && onChange(e.target.files[0]);
-                  handlePhotoInput(e);
-                }}
-              />
+              <>
+                <input
+                  ref={inputRef}
+                  hidden
+                  accept="image/*"
+                  type="file"
+                  onChange={(e) => {
+                    e.target.files[0] && onChange(e.target.files[0]);
+                    handlePhotoInput(e);
+                  }}
+                />
+                <p
+                  style={{ fontSize: "0.75rem", color: "#d32f2f", margin: "0" }}
+                >
+                  {error?.message}
+                </p>
+              </>
             )}
           />
+          {!disableImageInput && (
+            <Typography
+              style={{
+                fontWeight: 700,
+                fontSize: "1.2rem",
+                marginBottom: "10px",
+                marginTop: "40px",
+              }}
+            >
+              Contact Details
+            </Typography>
+          )}
           <Grid container justifyContent="space-between" sx={{ width: "100%" }}>
             <Grid item xs={5.5}>
               <label className="form-label">First Name</label>
@@ -185,34 +241,50 @@ const ContactForm = ({
             </Grid>
             <Grid item xs={5.5} sx={{ mt: 2 }}>
               <label className="form-label">Country</label>
-              <AutocompleteInput
-                id="country"
-                placeholder="Select a country"
-                options={countries}
-                columnName="value"
-                hasTwoColumns={false}
-                columnNameTwo=""
-                value={selectedCountries}
-                onChange={(e) => setSelectedCountries(e)}
-                error={false}
-                disableClear={true}
-                width="100%"
+              <Controller
+                control={control}
+                name="country"
+                defaultValue=""
+                rules={{ required: "Please select a country" }}
+                render={({ field: { ref, onChange, ...field } }) => (
+                  <AutocompleteInput
+                    id="country"
+                    placeholder="Select a country"
+                    options={countries}
+                    columnName="value"
+                    hasTwoColumns={false}
+                    columnNameTwo=""
+                    value={field.value}
+                    onChange={onChange}
+                    error={errors.country?.message}
+                    disableClear={true}
+                    width="100%"
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={5.5} sx={{ mt: 2 }}>
               <label className="form-label">Title</label>
-              <AutocompleteInput
-                id="title"
-                placeholder="Select a title"
-                options={titles}
-                columnName="value"
-                hasTwoColumns={false}
-                columnNameTwo=""
-                value={selectedTitle}
-                onChange={(e) => setSelectedTitle(e)}
-                error={false}
-                disableClear={true}
-                width="100%"
+              <Controller
+                control={control}
+                name="title"
+                defaultValue=""
+                rules={{ required: "Please select a title" }}
+                render={({ field: { ref, onChange, ...field } }) => (
+                  <AutocompleteInput
+                    id="title"
+                    placeholder="Select a title"
+                    options={titles}
+                    columnName="value"
+                    hasTwoColumns={false}
+                    columnNameTwo=""
+                    value={field.value}
+                    onChange={onChange}
+                    error={errors.title?.message}
+                    disableClear={true}
+                    width="100%"
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={5.5} sx={{ mt: 2 }}>
@@ -228,8 +300,8 @@ const ContactForm = ({
                 }) => (
                   <Tooltip
                     title={
-                      data
-                        ? data.isAdmin
+                      dataToPrefill
+                        ? dataToPrefill.isAdmin
                           ? "Unable to edit email of an admin"
                           : ""
                         : ""
@@ -239,7 +311,13 @@ const ContactForm = ({
                       id={`email`}
                       variant="outlined"
                       size="small"
-                      disabled={data ? (data.isAdmin ? true : false) : false}
+                      disabled={
+                        dataToPrefill
+                          ? dataToPrefill.isAdmin
+                            ? true
+                            : false
+                          : false
+                      }
                       error={error}
                       value={field.value}
                       onChange={onChange}
@@ -339,3 +417,17 @@ const ContactForm = ({
 };
 
 export default ContactForm;
+
+// onSubmit,
+// control,
+// handleSubmit,
+// selectedCountries,
+// setSelectedCountries,
+// selectedTitle,
+// setSelectedTitle,
+// data,
+// photoPreviewLink,
+// handleInputClick,
+// inputRef,
+// handlePhotoInput,
+// loading,
