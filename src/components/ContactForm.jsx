@@ -108,7 +108,6 @@ const ContactForm = ({
   });
 
   const prefillData = (data) => {
-    console.log("data to prefill", data);
     setValue("firstName", data.firstName);
     setValue("lastName", data.lastName);
     setValue("country", { value: data.country, label: data.country });

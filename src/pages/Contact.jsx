@@ -1,16 +1,27 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams, useOutletContext } from "react-router-dom";
 import useGetAccessToken from "../hooks/useGetAccessToken";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Tabs, Tab } from "@mui/material";
+import {
+  Tabs,
+  Tab,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { TabPanel, TabContext } from "@mui/lab";
 import { getContact } from "../services/contacts";
 import Loading from "../components/Loading";
 import PageHeader from "../components/PageHeader";
 import ContactForm from "../components/ContactForm";
 import ImageInput from "../components/ImageInput";
+import ScheduleTable from "../components/ScheduleTable";
 import Dummy from "../assets/dummy.jpg";
 import { uploadBytes, getDownloadURL, ref } from "firebase/storage";
+import { storage } from "../firebase";
+import { updateContact } from "../services/contacts";
 
 const Contact = () => {
   const [tabSelection, setTabSelection] = useState("detail");
@@ -80,14 +91,14 @@ const Contact = () => {
         const photoUrl = await getDownloadURL(snapshot.ref);
 
         data.photoUrl = photoUrl;
-        return updateContact(contactId, data, accessToken);
+        return updateContact(accessToken, data, contactId);
       }
 
-      return updateContact(contactId, data, accessToken);
+      return updateContact(accessToken, data, contactId);
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(["contacts"], { exact: true });
+        queryClient.invalidateQueries(["contact", contactId], { exact: true });
         setPhotoPreviewLink("");
         // navigate("/contacts");
         setOpenFeedback(true);
@@ -96,6 +107,22 @@ const Contact = () => {
       },
     }
   );
+
+  useEffect(() => {
+    if (updateHasError) {
+      console.log(updateError);
+      const errorMsg = updateError.errors[0].message;
+      setOpenFeedback(true);
+      setFeedbackSeverity("error");
+      if (errorMsg === "email must be unique") {
+        setFeedbackMsg(
+          `Email address is already in used. Please use another email address.`
+        );
+      } else {
+        setFeedbackMsg(errorMsg);
+      }
+    }
+  }, [updateHasError, updateError]);
 
   if (getContactLoading || getContactFetching) {
     return <Loading />;
@@ -134,7 +161,41 @@ const Contact = () => {
               dataToPrefill={contactFromFetch && contactFromFetch}
             />
           </TabPanel>
-          <TabPanel value="conferences">conferences</TabPanel>
+          <TabPanel value="conferences">
+            {contactFromFetch && contactFromFetch["Conferences"].length > 0 ? (
+              contactFromFetch["Conferences"].map((conference, index) => (
+                <Accordion key={`${conference.name}-${index}`}>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
+                    <Typography> {conference.name}</Typography>
+                  </AccordionSummary>
+
+                  <AccordionDetails>
+                    {conference.Sessions.length > 0 ? (
+                      <ScheduleTable
+                        conference={conference}
+                        dates={createDateArray(
+                          conference.startDate,
+                          conference.endDate,
+                          conference.Sessions
+                        )}
+                      />
+                    ) : (
+                      `${contactFromFetch.title} ${contactFromFetch.firstName} ${contactFromFetch.lastName} was invited to ${conference.name} but was not allocated with any presentation.`
+                    )}
+                  </AccordionDetails>
+                </Accordion>
+              ))
+            ) : (
+              <p className="p-3">
+                {`${contactFromFetch.title} ${contactFromFetch.firstName} ${contactFromFetch.lastName} did not participate in any
+              conference.`}
+              </p>
+            )}
+          </TabPanel>
         </TabContext>
       </div>
     </>

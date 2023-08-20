@@ -19,3 +19,13 @@ export const getContact = async (accessToken, id) => {
   const { data } = await makeRequest("GET", `speakers/${id}`, accessToken);
   return data;
 };
+
+export const updateContact = async (accessToken, data, id) => {
+  const response = await makeRequest(
+    "PUT",
+    `speakers/${id}`,
+    accessToken,
+    data
+  );
+  return response;
+};
